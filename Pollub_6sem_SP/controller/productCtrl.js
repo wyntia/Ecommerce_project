@@ -185,7 +185,7 @@ const rating= asyncHandler(async (req, res) => {
         let sum = getallrating.ratings.map((item) => item.star).reduce((prev, next) => prev + next, 0);
         let actualrating = Math.round(sum / totalrating);
         let productr = await Product.findByIdAndUpdate(prodId, {
-            totalrating: actualrating,
+            totalrating: Number(actualrating),
         },
         {
             new: true,
