@@ -16,9 +16,11 @@ const enqRouter = require('./routes/enqRoute');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const cors = require('cors');
 
 dbConnect();
 
+app.use(cors()); 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
