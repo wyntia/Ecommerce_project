@@ -349,6 +349,14 @@ footer .input-group .form-control {
 
 /*Blog Page Starts Here */
 
+.blog-card {
+  height: 100%; 
+}
+
+.blog-content {
+  flex: 1; 
+}
+
 .section-heading {
   font-size: 26px;
   line-height: 32px;
@@ -413,16 +421,32 @@ footer .input-group .form-control {
 
 /*Product Page Starts Here */
 
+.product-image {
+  width: 100%; /* Obraz będzie zawsze pełnej szerokości swojego kontenera */
+  height: 200px; /* Stała wysokość dla obrazu */
+  object-fit: cover; /* Obraz będzie przycięty i dopasowany do miejsca */
+}  
+
 .product-card {
   background-color: white;
   padding: 15px;
   border-radius: 10px;
   overflow: hidden;
   width: 100%;
+  max-width: 350px; /* Dodaj maksymalną szerokość dla karty produktu */
+  margin: auto; /* Centruje kartę produktu, jeśli jest mniej niż maksymalna szerokość */
 }
 
 .product-card .product-image {
-  height: 270px;
+  width: 100%; /* Obraz będzie zawsze pełnej szerokości swojego kontenera */
+  height: 200px; /* Stała wysokość dla obrazu */
+  overflow: hidden; /* Ukrywa części obrazu, które wychodzą poza granice */
+}
+
+.product-card .product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Obraz będzie przycięty i dopasowany do miejsca */
 }
 
 .product-card .product-image img {

@@ -5,9 +5,36 @@ import { FaHome, FaInfo } from "react-icons/fa";
 import { FaPhoneAlt } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
 import Container from '../components/Container';
+import * as you from 'yup';
+import { useFormik } from 'formik';
+import { useDispatch } from 'react-redux';
+import { createQuery } from '../features/contact/contactSlice';
 
 const Contact = () => {
+
+  const dispatch = useDispatch();
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      mobile: '',
+      comment: ''
+    },
+    validationSchema: you.object({
+      name: you.string().required('Name is required'),
+      email: you.string().email('Invalid email address').required('Email is required'),
+      mobile: you.string().required('Mobile is required'),
+      comment: you.string().required('Comments is required')
+    }),
+    onSubmit: values => {
+      dispatch(createQuery({name: values.name, email: values.email, mobile: values.mobile, comment: values.comment}));
+    }
+  })
+
+
+
   return (
+
     <>
       <Meta title={'Contact Us'} />
       <BreadCrumb title='Contact Us' />
@@ -20,18 +47,38 @@ const Contact = () => {
             <div className='contact-inner-wrapper d-flex justify-content-between'>
               <div>
                 <h3 className='contact-title mb-4'>Contact Information</h3>
-                <form action='' className='d-flex flex-column gap-15'>
+                <form action='' onSubmit={formik.handleSubmit} className='d-flex flex-column gap-15'>
                   <div>
-                    <input type='text' className='form-control' placeholder='Name' />
+                    <input type='text' className='form-control' placeholder='Name' name="name" onChange={formik.handleChange("name")} onBlur={formik.handleBlur("name")} value={formik.values.name} />
+                    <div className='errors'>
+                      {
+                        formik.touched.name && formik.errors.name ? <p className='text-danger'>{formik.errors.name}</p> : null
+                      }
+                    </div>
                   </div>
                   <div>
-                    <input type='text' className='form-control' placeholder='Email' />
+                    <input type='text' className='form-control' placeholder='Email' name="email" onChange={formik.handleChange("email")} onBlur={formik.handleBlur("email")} value={formik.values.email} />
+                    <div className='errors'>
+                      {
+                        formik.touched.email && formik.errors.email ? <p className='text-danger'>{formik.errors.email}</p> : null
+                      }
+                    </div>
                   </div>
                   <div>
-                    <input type='text' className='form-control' placeholder='Mobile' />
+                    <input type='text' className='form-control' placeholder='Mobile' name="mobile" onChange={formik.handleChange("mobile")} onBlur={formik.handleBlur("mobile")} value={formik.values.mobile} />
+                    <div className='errors'>
+                      {
+                        formik.touched.mobile && formik.errors.mobile ? <p className='text-danger'>{formik.errors.mobile}</p> : null
+                      }
+                    </div>
                   </div>
                   <div>
-                    <textarea name='' id='' cols='30' className='w-100 form-control' rows='4' placeholder='Comments' />
+                    <textarea id='' cols='30' className='w-100 form-control' rows='4' placeholder='Comments' name="comment" onChange={formik.handleChange("comment")} onBlur={formik.handleBlur("comment")} value={formik.values.comment} />
+                    <div className='errors'>
+                      {
+                        formik.touched.comment && formik.errors.comment ? <p className='text-danger'>{formik.errors.comment}</p> : null
+                      }
+                    </div>
                   </div>
                   <div>
                     <button className='button border-0'>Submit</button>

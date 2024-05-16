@@ -10,7 +10,6 @@ import { addToWishlist } from '../features/products/productSlice';
 
 const ProductCard = (props) => {
   const { grid, data } = props;
-  console.log(data)
   let location = useLocation();
   const dispatch = useDispatch();
   const addToWish = (id) => {
@@ -28,8 +27,8 @@ const ProductCard = (props) => {
                 <button className='border-0 bg-transparent' onClick={(e) => { addToWish(item?._id) }}><img src={wish} alt='wishlist' /></button>
               </div>
               <div className='product-image'>
-                <img src={item?.images[0].url} className='img-fluid' alt='product' />
-                <img src={item?.images[1].url} className='img-fluid' alt='product' />
+                <img src={item?.images[0].url} className='img-fluid product-img' alt='product' />
+                <img src={item?.images[1].url} className='img-fluid product-img' alt='product' />
               </div>
               <div className='product-details'>
                 <h6 className='brand'>{item?.brand}</h6>

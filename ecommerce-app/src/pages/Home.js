@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import BlogCard from "../components/BlogCard";
 import ProductCard from "../components/ProductCard";
 import SpecialProduct from "../components/SpecialProduct";
@@ -6,8 +6,27 @@ import { Link } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import Container from "../components/Container";
 import { services } from "../utils/Data";
+import { getAllBlogs } from "../features/blogs/blogSlice";
+import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
+import { getAllProducts } from "../features/products/productSlice";
 
 const Home = () => {
+
+  const blogState = useSelector((state) => state?.blog?.blog);
+  const productState = useSelector((state) => state?.product?.product);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    getblogs();
+    getProducts();
+  }, []);
+  const getblogs = () => {
+    dispatch(getAllBlogs());
+  };
+
+  const getProducts = () => {
+    dispatch(getAllProducts());
+  }
   return (
     <>
       <Container class1="home-wrapper-1 py-5">
@@ -251,10 +270,14 @@ const Home = () => {
             <h3 className="section-heading">Special Products</h3>
           </div>
           <div className="row">
-            <SpecialProduct> </SpecialProduct>
-            <SpecialProduct> </SpecialProduct>
-            <SpecialProduct> </SpecialProduct>
-            <SpecialProduct> </SpecialProduct>
+            {
+              productState && productState.filter(item => item.tags.includes('special')).slice(0, 4).map((item, index) => {
+                return (
+                  <SpecialProduct key={index} brand={item?.brand} title={item?.title} stars={item?.totalrating}
+                    price={item?.price} quantity={item?.quantity} image={item?.images[1].url} sold={item?.sold} />
+                )
+              })
+            }
           </div>
         </div>
       </Container>
@@ -265,10 +288,14 @@ const Home = () => {
           </div>
         </div>
         <div className="row">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          {
+            productState && productState.filter(item => item.tags.includes('popular')).slice(0, 4).map((item, index) => {
+              return (
+                <SpecialProduct key={index} brand={item?.brand} title={item?.title} stars={item?.totalrating}
+                  price={item?.price} quantity={item?.quantity} image={item?.images[1].url} sold={item?.sold} />
+              )
+            })
+          }
         </div>
       </Container>
       <Container class1="marquee-wrapper py-5">
@@ -311,18 +338,15 @@ const Home = () => {
           <h3 className="section-heading">Latest News</h3>
         </div>
         <div className="row">
-          <div className="col-3">
-            <BlogCard />
-          </div>
-          <div className="col-3">
-            <BlogCard />
-          </div>
-          <div className="col-3">
-            <BlogCard />
-          </div>
-          <div className="col-3">
-            <BlogCard />
-          </div>
+          {
+            Array.isArray(blogState) && blogState.slice(0, 4).map((item, index) => {
+              return (
+                <div className='col-3 mb-3' key={index}>
+                  <BlogCard id={item?._id} title={item?.title} description={item?.description} date={moment(item?.created_at).format('MMMM Do YYYY, h:mm:ss a')} image={item?.image} />
+                </div>
+              )
+            })
+          }
         </div>
       </Container>
     </>
