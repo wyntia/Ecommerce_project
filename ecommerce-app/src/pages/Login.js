@@ -11,7 +11,7 @@ import { loginUser } from '../features/user/userSlice';
 
 const loginSchema = yup.object({
     email: yup.string().email("Please enter a valid email address").required("Email is required"),
-    password: yup.string().required("Password is required").min(8, "Password must be at least 8 characters long"),
+    password: yup.string().required("Password is required"),
 });
 
 const Login = () => {

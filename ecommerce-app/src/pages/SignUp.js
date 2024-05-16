@@ -14,7 +14,7 @@ const signUpSchema = yup.object({
     lastname: yup.string().required("Last name is required"),
     email: yup.string().email("Please enter a valid email address").required("Email is required"),
     mobile: yup.string().matches(/^\d{9}$/, 'Please enter a valid mobile number').required("Mobile number is required"),
-    password: yup.string().required("Password is required").min(8, "Password must be at least 8 characters long"),
+    password: yup.string().required("Password is required"),
 });
 
 

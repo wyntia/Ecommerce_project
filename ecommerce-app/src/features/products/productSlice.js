@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { productService } from "./productService";
+import { toast } from "react-toastify";
 
 export const getAllProducts = createAsyncThunk("product/get", async (thunkApi) => {
     try {
@@ -54,7 +55,9 @@ export const productSlice = createSlice({
                 state.isError = false;
                 state.isSuccess = true;
                 state.addToWishlist = action.payload;
-                state.message = ("Product added to wishlist");
+                if (state.isSuccess === true) {
+                    toast.success('Success');
+                }
             }).addCase(addToWishlist.rejected, (state, action) => {
                 state.isLoading = false;
                 state.isError = true;
