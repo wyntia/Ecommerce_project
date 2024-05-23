@@ -5,7 +5,7 @@ import ProductCard from '../components/ProductCard'
 import ReactStars from "react-rating-stars-component";
 import ReactImageZoom from 'react-image-zoom';
 import Color from '../components/Color';
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { IoGitCompare } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import watch from '../images/watch.jpg'
@@ -13,22 +13,39 @@ import Container from '../components/Container';
 import wish from '../images/wish.svg'
 import { useDispatch, useSelector } from 'react-redux';
 import { getAProduct, addToWishlist } from '../features/products/productSlice';
-import { addProdToCart } from '../features/user/userSlice';
+import { addProdToCart, getUserCart } from '../features/user/userSlice';
 import { toast } from "react-toastify";
 
 const SingleProduct = () => {
     const location = useLocation();
     const getProductId = location.pathname.split('/')[2];
+    const [alreadyAdded, setAlreadyAdded] = useState(false);
+    const navigate = useNavigate();
     const dispatch = useDispatch();
+
     useEffect(() => {
-        dispatch(getAProduct(getProductId));
-    }, []);
+        dispatch(getAProduct(getProductId)); // Assuming getAProduct is defined somewhere
+        dispatch(getUserCart());
+    }, [dispatch, getProductId]);
+
     const addToWish = (id) => {
         dispatch(addToWishlist(id));
     }
-    const productState = useSelector(state => state.product.product);
-    const [color, setColor]= useState(null);
-    const [quantity, setQuantity]= useState(1);
+     const productState = useSelector(state => state.product.product);
+    const cartState = useSelector(state => state.auth.cartProducts?.products);
+
+    useEffect(() => {
+        if (cartState) {
+            for (let i = 0; i < cartState.length; i++) {
+                if (getProductId === cartState[i]?.productId?._id) {
+                    setAlreadyAdded(true);
+                    break;
+                }
+            }
+        }
+    }, [cartState, getProductId]);
+    const [color, setColor] = useState(null);
+    const [quantity, setQuantity] = useState(1);
     const prodImgZoom = productState && productState.images && productState.images[0] ? productState.images[0].url : 'defaultImageUrl';
     const props = { width: 400, height: 600, zoomWidth: 600, img: prodImgZoom };
     const { orderedProduct } = useState(1);
@@ -41,16 +58,14 @@ const SingleProduct = () => {
         document.execCommand('copy')
         textField.remove()
     }
-    const uploadCart= ()=>{
-        if(color === null){
-            toast.error('Please select a color')
-            return false;
+    const uploadCart = () => {
+        if (color === null) {
+            toast.error('Please select a color');
+            return;
+        } else {
+            dispatch(addProdToCart({ product: productState?._id, quantity, color, price: productState?.price }))
         }
-        else{
-            console.log(productState?._id, quantity, color, productState?.price);
-            dispatch(addProdToCart({product: productState?._id, quantity, color, price: productState?.price}));
-        }
-    }
+    };
 
     return (
         <div>
@@ -112,19 +127,31 @@ const SingleProduct = () => {
                                         <span className='badge border border-1 bg-white text-dark border-secondary'>L</span>
                                     </div>
                                 </div>
-                                <div className='d-flex gap-10 flex-column mt-2 mb-3'>
-                                    <h3 className='product-heading'>Color: </h3> <Color setColor={setColor} colorData={productState?.color}/>
-                                </div>
+                                {
+                                    alreadyAdded === false && <>
+                                        <div className='d-flex gap-10 flex-column mt-2 mb-3'>
+                                            <h3 className='product-heading'>Color: </h3> <Color setColor={setColor} colorData={productState?.color} />
+                                        </div>
+                                    </>
+                                }
                                 <div className='d-flex gap-15 align-items-center flex-row mt-2 mb-3'>
-                                    <h3 className='product-heading'>Quantity: </h3>
-                                    <div className=''>
-                                        <input type='number' className='form-control' style={{ "width": "70px" }} min={1} max={10}  onChange={(e) => setQuantity(e.target.value)} value={quantity}/>
-                                    </div>
+                                    {
+                                        alreadyAdded === false && <>
+                                            <h3 className='product-heading'>Quantity: </h3>
+                                            <div className=''>
+                                                <input type='number' className='form-control' style={{ "width": "70px" }} min={1} max={10} onChange={(e) => setQuantity(e.target.value)} value={quantity} />
+                                            </div>
+                                        </>
+                                    }
                                     <div className='d-flex align-items-center gap-30 ms-4'>
                                         <button className='button border-0' type='button' onClick={() => {
-                                            uploadCart()
-                                        }}>Add To Cart</button>
-                                        <Link to='/signup' className='button signup border-0 align-items-center'>Buy It Now</Link>
+                                            alreadyAdded ? navigate('/cart') : uploadCart()
+                                        }}>
+                                            {
+                                                alreadyAdded? "Go To Cart": "Add to Cart"
+                                            }
+                                        </button>
+                                        <button className='button signup border-0 align-items-center'>Buy It Now</button>
                                     </div>
                                 </div>
                                 <div className='d-flex align-items-center gap-15'>

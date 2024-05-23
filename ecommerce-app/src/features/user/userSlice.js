@@ -34,6 +34,7 @@ export const addProdToCart = createAsyncThunk(
     "user/cart/add", 
     async (cartData, thunkApi) => {
         try{
+            console.log(cartData);
             return await authService.addToCart(cartData);
         }catch(error){
             return thunkApi.rejectWithValue(error);

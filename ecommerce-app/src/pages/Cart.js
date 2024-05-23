@@ -11,7 +11,7 @@ import Color from '../components/Color';
 
 const Cart = () => {
     const dispatch = useDispatch();
-    const userCartState = useSelector(state => state.auth.cartProducts)
+    const userCartState = useSelector(state => state.auth.cart)
     useEffect(() => {
         dispatch(getUserCart());
     }, []);
@@ -30,7 +30,7 @@ const Cart = () => {
                         </div>
                         {
 
-                            userCartState && userCartState.products && userCartState.products.map((item, index) => {
+                            userCartState && userCartState.product && userCartState.product.map((item, index) => {
                                 return (
                                     <div className='cart-data py-3 mb-2 d-flex justify-content-between align-items-center' key={index}>
                                         <div className='cart-col-1 d-flex align-items-center gap-15'>
