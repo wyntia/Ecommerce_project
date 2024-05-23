@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import BlogCard from "../components/BlogCard";
 import ProductCard from "../components/ProductCard";
 import SpecialProduct from "../components/SpecialProduct";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import Container from "../components/Container";
 import { services } from "../utils/Data";
@@ -273,7 +273,7 @@ const Home = () => {
             {
               productState && productState.filter(item => item.tags.includes('special')).slice(0, 4).map((item, index) => {
                 return (
-                  <SpecialProduct key={index} brand={item?.brand} title={item?.title} stars={item?.totalrating}
+                  <SpecialProduct key={index} id={item?._id} brand={item?.brand} title={item?.title} stars={item?.totalrating}
                     price={item?.price} quantity={item?.quantity} image={item?.images[1].url} sold={item?.sold} />
                 )
               })

@@ -1038,3 +1038,20 @@ footer .input-group .form-control {
 }
 
 /*Shipping Page Ends Here */
+
+
+.button-as-link {
+  background: none;
+  border: none;
+  color: var(--color-777777); /* Kolor linku */
+  text-decoration: none; /* Podkreślenie linku */
+  cursor: pointer; /* Kursor ręki */
+  padding: 0; /* Usuń domyślne paddingi przycisku */
+  font: inherit; /* Czcionka jak dla linku */
+  font-size: 14px;
+  
+}
+
+.button-as-link:hover {
+  color: var(--color-131921); /* Kolor linku po najechaniu */
+}

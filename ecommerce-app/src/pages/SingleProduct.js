@@ -1,18 +1,53 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import BreadCrumb from '../components/BreadCrumb'
 import Meta from '../components/Meta'
 import ProductCard from '../components/ProductCard'
 import ReactStars from "react-rating-stars-component";
 import ReactImageZoom from 'react-image-zoom';
 import Color from '../components/Color';
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { IoGitCompare } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import watch from '../images/watch.jpg'
 import Container from '../components/Container';
+import wish from '../images/wish.svg'
+import { useDispatch, useSelector } from 'react-redux';
+import { getAProduct, addToWishlist } from '../features/products/productSlice';
+import { addProdToCart, getUserCart } from '../features/user/userSlice';
+import { toast } from "react-toastify";
 
 const SingleProduct = () => {
-    const props = { width: 400, height: 600, zoomWidth: 600, img: "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=pexels-ferarcosn-190819.jpg&fm=jpg" };
+    const location = useLocation();
+    const getProductId = location.pathname.split('/')[2];
+    const [alreadyAdded, setAlreadyAdded] = useState(false);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getAProduct(getProductId)); // Assuming getAProduct is defined somewhere
+        dispatch(getUserCart());
+    }, [dispatch, getProductId]);
+
+    const addToWish = (id) => {
+        dispatch(addToWishlist(id));
+    }
+     const productState = useSelector(state => state.product.product);
+    const cartState = useSelector(state => state.auth.cartProducts?.products);
+
+    useEffect(() => {
+        if (cartState) {
+            for (let i = 0; i < cartState.length; i++) {
+                if (getProductId === cartState[i]?.productId?._id) {
+                    setAlreadyAdded(true);
+                    break;
+                }
+            }
+        }
+    }, [cartState, getProductId]);
+    const [color, setColor] = useState(null);
+    const [quantity, setQuantity] = useState(1);
+    const prodImgZoom = productState && productState.images && productState.images[0] ? productState.images[0].url : 'defaultImageUrl';
+    const props = { width: 400, height: 600, zoomWidth: 600, img: prodImgZoom };
     const { orderedProduct } = useState(1);
     const copyToClipboard = (text) => {
         console.log('text', text)
@@ -23,6 +58,15 @@ const SingleProduct = () => {
         document.execCommand('copy')
         textField.remove()
     }
+    const uploadCart = () => {
+        if (color === null) {
+            toast.error('Please select a color');
+            return;
+        } else {
+            dispatch(addProdToCart({ product: productState?._id, quantity, color, price: productState?.price }))
+        }
+    };
+
     return (
         <div>
             <Meta title={'Product Name'} />
@@ -36,23 +80,21 @@ const SingleProduct = () => {
                             </div>
                         </div>
                         <div className='other-product-images d-flex flex-wrap gap-15'>
-                            <div><img src={watch} alt='watch' className='img-fluid' /></div>
-                            <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=pexels-ferarcosn-190819.jpg&fm=jpg' alt='watch' className='img-fluid' /></div>
-                            <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=pexels-ferarcosn-190819.jpg&fm=jpg' alt='watch' className='img-fluid' /></div>
-                            <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=pexels-ferarcosn-190819.jpg&fm=jpg' alt='watch' className='img-fluid' /></div>
+                            <div><img src={productState && productState.images && productState.images[0] ? productState.images[0].url : 'defaultImageUrl'} alt='watch' className='img-fluid' /></div>
+                            <div><img src={productState && productState.images && productState.images[1] ? productState.images[1].url : 'defaultImageUrl'} alt='watch' className='img-fluid' /></div>
                         </div>
                     </div>
                     <div className='col-6 '>
                         <div className='main-product-details'>
                             <div className='border-bottom'>
-                                <h3 className='title'>Timex Men's Expedition Scout 40mm Watch</h3>
+                                <h3 className='title'>{productState?.title}</h3>
                             </div>
                             <div className='border-bottom py-3'>
-                                <p className='price'>$100</p>
+                                <p className='price'>$ {productState?.price}</p>
                                 <div className='d-flex align-items-center gap-10'>
                                     <ReactStars
                                         count={5}
-                                        value={4}
+                                        value={Number(productState?.totalrating)}
                                         size={24}
                                         edit={false}
                                         activeColor="#ffd700"
@@ -66,16 +108,16 @@ const SingleProduct = () => {
                                     <h3 className='product-heading'>Type: </h3> <p className='product-data'>Watch</p>
                                 </div>
                                 <div className='d-flex gap-10 align-items-center my-2'>
-                                    <h3 className='product-heading'>Brand: </h3> <p className='product-data'>Havels</p>
+                                    <h3 className='product-heading'>Brand: </h3> <p className='product-data'>{productState?.brand}</p>
                                 </div>
                                 <div className='d-flex gap-10 align-items-center my-2'>
-                                    <h3 className='product-heading'>Category: </h3> <p className='product-data'>Watch</p>
+                                    <h3 className='product-heading'>Category: </h3> <p className='product-data'>{productState?.category}</p>
                                 </div>
                                 <div className='d-flex gap-10 align-items-center my-2'>
-                                    <h3 className='product-heading'>Tags: </h3> <p className='product-data'>Watch</p>
+                                    <h3 className='product-heading'>Tags: </h3> <p className='product-data'> {productState?.tags + " "} </p>
                                 </div>
                                 <div className='d-flex gap-10 align-items-center my-2'>
-                                    <h3 className='product-heading'>Availability: </h3> <p className='product-data'>In Stock</p>
+                                    <h3 className='product-heading'>Availability: </h3> <p className='product-data'>{productState?.quantity > 0 ? 'In Stock' : 'Unavailable'}</p>
                                 </div>
                                 <div className='d-flex gap-10 flex-column mt-2 mb-3'>
                                     <h3 className='product-heading'>Size: </h3>
@@ -85,17 +127,31 @@ const SingleProduct = () => {
                                         <span className='badge border border-1 bg-white text-dark border-secondary'>L</span>
                                     </div>
                                 </div>
-                                <div className='d-flex gap-10 flex-column mt-2 mb-3'>
-                                    <h3 className='product-heading'>Color: </h3> <Color />
-                                </div>
+                                {
+                                    alreadyAdded === false && <>
+                                        <div className='d-flex gap-10 flex-column mt-2 mb-3'>
+                                            <h3 className='product-heading'>Color: </h3> <Color setColor={setColor} colorData={productState?.color} />
+                                        </div>
+                                    </>
+                                }
                                 <div className='d-flex gap-15 align-items-center flex-row mt-2 mb-3'>
-                                    <h3 className='product-heading'>Quantity: </h3>
-                                    <div className=''>
-                                        <input type='number' className='form-control' style={{ "width": "70px" }} min={1} max={10} />
-                                    </div>
+                                    {
+                                        alreadyAdded === false && <>
+                                            <h3 className='product-heading'>Quantity: </h3>
+                                            <div className=''>
+                                                <input type='number' className='form-control' style={{ "width": "70px" }} min={1} max={10} onChange={(e) => setQuantity(e.target.value)} value={quantity} />
+                                            </div>
+                                        </>
+                                    }
                                     <div className='d-flex align-items-center gap-30 ms-4'>
-                                        <button className='button border-0' type='submit'>Add To Cart</button>
-                                        <Link to='/signup' className='button signup border-0 align-items-center'>Buy It Now</Link>
+                                        <button className='button border-0' type='button' onClick={() => {
+                                            alreadyAdded ? navigate('/cart') : uploadCart()
+                                        }}>
+                                            {
+                                                alreadyAdded? "Go To Cart": "Add to Cart"
+                                            }
+                                        </button>
+                                        <button className='button signup border-0 align-items-center'>Buy It Now</button>
                                     </div>
                                 </div>
                                 <div className='d-flex align-items-center gap-15'>
@@ -103,7 +159,9 @@ const SingleProduct = () => {
                                         <a href='#compare-product'> <IoGitCompare className='fs-5 mb-2' /> Add to Compare</a>
                                     </div>
                                     <div>
-                                        <a href='#wishlist'><IoMdHeartEmpty className='fs-5 mb-2' /> Add to Wishlist</a>
+                                        <button className='button-as-link' onClick={(e) => { addToWish(productState?._id) }}>
+                                            <img src={wish} alt='wishlist' />Add to wishlist
+                                        </button>
                                     </div>
                                 </div>
                                 <div className='d-flex gap-10 flex-column my-3'>
@@ -112,7 +170,7 @@ const SingleProduct = () => {
                                 <div className='d-flex gap-10 align-items-center my-2'>
                                     <h3 className='product-heading'>Product Link: </h3>
                                     <button style={{ background: 'none', border: 'none', color: 'black', textDecoration: 'none', cursor: 'pointer', 'font-size': '14px' }} onClick={() => {
-                                        copyToClipboard("https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=pexels-ferarcosn-190819.jpg&fm=jpg")
+                                        copyToClipboard(window.location.href)
                                     }}>Copy Product Link</button>
                                 </div>
                             </div>
@@ -126,8 +184,8 @@ const SingleProduct = () => {
                         <h4>Description</h4>
                         <div className='bg-white p-3'>
 
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed interdum orci tortor, eu rhoncus turpis ullamcorper vel. Proin ullamcorper vel sem vitae sodales. Praesent volutpat fermentum arcu. Ut in vulputate elit. Aliquam ex neque, suscipit vel metus in, ultrices pretium nulla. Maecenas viverra sapien vitae lobortis lacinia. Donec commodo nisi eu arcu facilisis consectetur. Mauris risus sem, consequat ut magna ac, pulvinar tincidunt ante. Suspendisse ut accumsan leo, iaculis efficitur sem.
+                            <p dangerouslySetInnerHTML={{ __html: productState?.description }}>
+
                             </p>
                         </div>
                     </div>
@@ -144,7 +202,7 @@ const SingleProduct = () => {
                                     <div className='d-flex align-items-center gap-10'>
                                         <ReactStars
                                             count={5}
-                                            value={4}
+                                            value={Number(productState?.totalrating)}
                                             size={24}
                                             edit={false}
                                             activeColor="#ffd700"
@@ -184,29 +242,40 @@ const SingleProduct = () => {
                                         <h6 className='mb-0'>Wyntia</h6>
                                         <ReactStars
                                             count={5}
-                                            value={4}
-                                            size={24}
+                                            value={
+                                                productState &&
+                                                    productState.ratings &&
+                                                    productState.ratings[0] &&
+                                                    !isNaN(productState.ratings[0].star) ?
+                                                    Number(productState.ratings[0].star) : 3
+                                            } size={24}
                                             edit={false}
                                             activeColor="#ffd700"
                                         />
                                     </div>
-                                    <p className='mt-3'>The href attribute requires a valid value to be accessible. Provide a valid, navigable address as the href value. If you cannot provide a valid href, but still need the element to resemble a link, use a button and change it with appropriate styles.</p>
-                                </div>
+                                    <p className='mt-3'>{productState && productState.ratings && productState.ratings[0] ? productState.ratings[0].comment : ''}</p>                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </Container>
-            <Container class1='popular-wrapper py-5 home-wrapper-2'>
+            {/* <Container class1='popular-wrapper py-5 home-wrapper-2'>
                 <div className='row'>
                     <div className='col-12'>
                         <h3 className='section-heading'>Our Popular Products</h3>
                     </div>
                 </div>
-                <div className='row'>
-                    <ProductCard />
+                <div className="row">
+                    {
+                        productState && productState.filter(item => item.tags.includes('popular')).slice(0, 4).map((item, index) => {
+                            return (
+                                <SpecialProduct key={index} brand={item?.brand} title={item?.title} stars={item?.totalrating}
+                                    price={item?.price} quantity={item?.quantity} image={item?.images[1].url} sold={item?.sold} />
+                            )
+                        })
+                    }
                 </div>
-            </Container>
+            </Container> */}
         </div>
     )
 }
