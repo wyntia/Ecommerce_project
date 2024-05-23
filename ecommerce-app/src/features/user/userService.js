@@ -24,9 +24,7 @@ const getUserWishlist = async()=>{
 }
 
 const addToCart= async(cartData)=>{
-    console.log(cartData)
     const response = await axios.post(`${base_url}user/cart`, cartData, config());
-    console.log(response)
     if(response.data){
         return response.data;
     }

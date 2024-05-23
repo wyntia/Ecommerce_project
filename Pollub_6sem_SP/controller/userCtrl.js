@@ -318,17 +318,9 @@ const userCart = asyncHandler(async (req, res) => {
     const { productId, color, quantity, price } = req.body;
     const { _id } = req.user;
     validateMongodbId(_id);
-
     try {
         let cart = await Cart.findOne({ userId: _id });
-
-        if (!cart) {
-            cart = new Cart({ userId: _id, products: [] });
-        }
-
-        const productIndex = cart.products.findIndex(
-            p => p.productId && p.color && p.productId.toString() === productId && p.color.toString() === color
-        );
+        const productIndex = cart.products.findIndex(p => p.productId.toString() === productId && p.color._id.toString() === color._id);
 
         if (productIndex > -1) {
             cart.products[productIndex].quantity += quantity;
@@ -340,23 +332,18 @@ const userCart = asyncHandler(async (req, res) => {
         await cart.save();
         res.json(cart);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        throw new Error(error);
     }
 });
-
-
 
 const getUserCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     validateMongodbId(_id);
-
     try {
-        let cart = await Cart.findOne({ userId: _id })
-            .populate('products.productId')
-            .populate('products.color');
+        let cart = await Cart.findOne({ userId: _id }).populate("products.productId").populate("products.color");
 
         if (!cart) {
-            return res.status(404).json({ message: 'Cart not found' });
+            return res.status(404).json({ message: "Cart not found" });
         }
 
         // Filter out products that don't exist
@@ -364,22 +351,21 @@ const getUserCart = asyncHandler(async (req, res) => {
 
         res.json(cart);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        throw new Error(error);
     }
 });
 
 const emptyCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     validateMongodbId(_id);
-
     try {
-        const cart = await Cart.findOneAndDelete({ userId: _id });
+        const user = await User.findOne({ _id });
+        const cart = await Cart.findOneAndDelete({ orderBy: user._id });
         res.json(cart);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        throw new Error(error);
     }
 });
-
 
 const applyCoupon = asyncHandler(async (req, res) => {
     const { coupon } = req.body;
