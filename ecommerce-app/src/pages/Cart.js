@@ -8,6 +8,8 @@ import Container from '../components/Container';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserCart } from '../features/user/userSlice';
 import Color from '../components/Color';
+import axios from 'axios';
+import { base_url, config } from '../utils/axiosConfig';
 
 const Cart = () => {
     const dispatch = useDispatch();
@@ -15,6 +17,17 @@ const Cart = () => {
     useEffect(() => {
         dispatch(getUserCart());
     }, []);
+
+    const handleDelete = async (productId) => {
+        try {
+            await axios.delete(`${base_url}user/cart/${productId}`, config());
+            // Po usunięciu produktu, odśwież koszyk
+            await dispatch(getUserCart());
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div>
             <Meta title={'Cart'} />
@@ -30,7 +43,7 @@ const Cart = () => {
                         </div>
                         {
 
-                            userCartState && userCartState.products && userCartState.products.map((item, index) => {
+                            userCartState && userCartState.map((item, index) => {
                                 return (
                                     <div className='cart-data py-3 mb-2 d-flex justify-content-between align-items-center' key={index}>
                                         <div className='cart-col-1 d-flex align-items-center gap-15'>
@@ -40,7 +53,7 @@ const Cart = () => {
                                                 <p >{item?.productId?.title}</p>
                                                 <p className='d-flex gap-3 '>Color:
                                                     <ul className='colors ps-0'>
-                                                        <li style={{backgroundColor: item?.color.title}}/>
+                                                        <li style={{backgroundColor: item?.color?.title}}/>
                                                     </ul>
                                                 </p>
                                                 <p >Size: M</p>
@@ -54,11 +67,11 @@ const Cart = () => {
                                                 <input type='number' className='form-control' id='' name='' min={1} max={10} value={item?.quantity} />
                                             </div>
                                             <div>
-                                                <MdDelete className='text-danger' />
+                                                <MdDelete className='text-danger' onClick={() => handleDelete(item?.productId?._id)} />
                                             </div>
                                         </div>
                                         <div className='cart-col-4'>
-                                            <h5 className='price'>$ {item?.productId?.price * userCartState?.quantity}</h5>
+                                            <h5 className='price'>$ {item?.productId?.price * item?.quantity}</h5>
                                         </div>
                                     </div>
                                 )

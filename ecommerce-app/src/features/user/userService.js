@@ -23,8 +23,10 @@ const getUserWishlist = async()=>{
     }
 }
 
-const addToCart= async(cartData)=>{
-    const response = await axios.post(`${base_url}user/cart`, cartData, config());
+const addToCart = async(cartData) => {
+    const { product, quantity, color, price } = cartData;
+    const data = { productId: product, quantity, color, price };
+    const response = await axios.post(`${base_url}user/cart`, data, config());
     if(response.data){
         return response.data;
     }
@@ -37,10 +39,18 @@ const getCart= async()=>{
     }
 }
 
+const removeProductFromCart = async(productId)=>{
+    const response = await axios.delete(`${base_url}user/cart/${productId}`, config());
+    if(response.data){
+        return response.data;
+    }
+}
+
 export const authService = {
     register,
     login,
     getUserWishlist,
     addToCart,
-    getCart
+    getCart,
+    removeProductFromCart
 };

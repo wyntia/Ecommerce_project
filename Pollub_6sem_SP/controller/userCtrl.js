@@ -318,19 +318,23 @@ const userCart = asyncHandler(async (req, res) => {
     const { productId, color, quantity, price } = req.body;
     const { _id } = req.user;
     validateMongodbId(_id);
-    try {
-        let cart = await Cart.findOne({ userId: _id });
-        const productIndex = cart.products.findIndex(p => p.productId.toString() === productId && p.color._id.toString() === color._id);
 
-        if (productIndex > -1) {
-            cart.products[productIndex].quantity += quantity;
-            cart.products[productIndex].price = price * cart.products[productIndex].quantity;
-        } else {
-            cart.products.push({ productId, color, quantity, price: price * quantity });
+    try {
+        let user = await User.findById(_id);
+        if (!user) {
+            throw new Error('User not found');
         }
 
-        await cart.save();
-        res.json(cart);
+        const productIndex = user.cart.findIndex(p => p.productId.toString() === productId && p.color === color);
+        if (productIndex > -1) {
+            user.cart[productIndex].quantity += quantity;
+            user.cart[productIndex].price = price;
+        } else {
+            user.cart.push({ productId, color, quantity, price });
+        }
+
+        const savedUser = await user.save();
+        res.json(savedUser.cart);
     } catch (error) {
         throw new Error(error);
     }
@@ -339,17 +343,40 @@ const userCart = asyncHandler(async (req, res) => {
 const getUserCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     validateMongodbId(_id);
-    try {
-        let cart = await Cart.findOne({ userId: _id }).populate("products.productId").populate("products.color");
 
-        if (!cart) {
-            return res.status(404).json({ message: "Cart not found" });
+    try {
+        const user = await User.findById(_id).populate('cart.productId').populate('cart.color').populate({
+            path: 'cart.color',
+            model: 'Color'
+        });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
 
-        // Filter out products that don't exist
-        cart.products = cart.products.filter(product => product.productId && product.color);
+        res.json(user.cart);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
 
-        res.json(cart);
+const removeProductFromCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { productId } = req.params; 
+    validateMongodbId(_id);
+
+    try {
+        const user = await User.findById(_id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const itemIndex = user.cart.findIndex(item => item.productId.toString() === productId);
+
+        if (itemIndex > -1) {
+            user.cart.splice(itemIndex, 1);
+        }
+
+        await user.save();
+        res.json(user.cart);
     } catch (error) {
         throw new Error(error);
     }
@@ -358,10 +385,17 @@ const getUserCart = asyncHandler(async (req, res) => {
 const emptyCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     validateMongodbId(_id);
+
     try {
-        const user = await User.findOne({ _id });
-        const cart = await Cart.findOneAndDelete({ orderBy: user._id });
-        res.json(cart);
+        const user = await User.findById(_id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        user.cart = [];
+        const savedUser = await user.save();
+
+        res.json(savedUser.cart);
     } catch (error) {
         throw new Error(error);
     }
@@ -511,6 +545,7 @@ module.exports = {
     saveAdress,
     userCart,
     getUserCart,
+    removeProductFromCart,
     emptyCart,
     applyCoupon,
     createOrder,
