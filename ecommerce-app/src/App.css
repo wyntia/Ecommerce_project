@@ -1055,3 +1055,7 @@ footer .input-group .form-control {
 .button-as-link:hover {
   color: var(--color-131921); /* Kolor linku po najechaniu */
 }
+
+.logout{
+  margin: auto;
+}

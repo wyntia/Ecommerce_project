@@ -47,10 +47,11 @@ const Login = () => {
                 <div className='row'>
                     <div className='col-12'>
                         <div className='auth-card'>
-                            <h3 className='text-center mb-3'>Login</h3>
+                            {!localStorage.getItem('token') && <h3 className='text-center mb-3'>Login</h3>}
                             {localStorage.getItem('token') ? ( // jeśli jest customer w localStorage
-                                <button onClick={handleLogout}>Logout</button> // wyświetl przycisk wylogowania
+                                <button onClick={handleLogout} className='button border-0 d-flex logout'>Logout</button> // wyświetl przycisk wylogowania
                             ) : (
+
                                 <form action='' onSubmit={formik.handleSubmit} className='d-flex flex-column gap-15'>
                                     <CustomInput type='email' name='email' placeholder='Email' onChange={formik.handleChange('email')} onBlur={formik.handleBlur('email')} value={formik.values.email} />
                                     <div className='error mb-0'>

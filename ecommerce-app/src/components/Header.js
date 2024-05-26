@@ -14,13 +14,20 @@ const Header = () => {
   const cartState = useSelector(state => state?.auth?.cartProducts);
   const auth = useSelector(state => state.auth);
   const [total, setTotal] = useState(null);
+  const [firstname, setFirstname] = useState('');
+
   useEffect(() => {
+
+    if (auth?.user?.firstname) {
+      setFirstname(auth.user.firstname);
+  }
+
     let sum = 0;
     for (let i = 0; i < cartState?.length; i++) {
       sum += cartState[i]?.productId?.price * cartState[i]?.quantity;
       setTotal(sum);
     }
-  }, [cartState]);
+  }, [cartState, auth]);
   return (
     <>
       <header className='header-top-strip py-3'>
@@ -80,7 +87,7 @@ const Header = () => {
                 <Link to='/login' className='d-flex align-items-center gap-10 text-white'>
                   <img className='header-img' src={user} alt="user" />
                   <p className='mb-0'>
-                    {auth?.isSuccess ? auth?.user?.firstname : "Login"} <br /> My Account
+                    {auth?.isSuccess ? firstname : "Login"} <br /> My Account
                   </p>
                 </Link>
               </div>
@@ -88,7 +95,7 @@ const Header = () => {
                 <Link to='/cart' className='d-flex align-items-center gap-10 text-white'>
                   <img className='header-img' src={cart} alt="cart" />
                   <div className='d-flex flex-column gap-10'>
-                    <span className='badge bg-white text-dark'>0</span>
+                    <span className='badge bg-white text-dark'>{cartState?.length}</span>
                     <p className='mb-0'>$ {total ? total : 0}</p>
                   </div>
                 </Link>

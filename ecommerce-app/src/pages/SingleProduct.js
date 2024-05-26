@@ -22,7 +22,9 @@ const SingleProduct = () => {
     const dispatch = useDispatch();
     const cartState = useSelector(state => state.auth.cartProducts);
     const [alreadyAdded, setAlreadyAdded] = useState(false);
-    const navigate= useNavigate();
+    const productState = useSelector(state => state.product.product);
+
+    const navigate = useNavigate();
     useEffect(() => {
         dispatch(getAProduct(getProductId));
         dispatch(getUserCart());
@@ -39,9 +41,8 @@ const SingleProduct = () => {
                 }
             }
         }
-    }, [cartState, getProductId]);
+    }, [cartState, getProductId, productState]);
 
-    const productState = useSelector(state => state.product.product);
     const [color, setColor] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const prodImgZoom = productState && productState.images && productState.images[0] ? productState.images[0].url : 'defaultImageUrl';
@@ -91,14 +92,17 @@ const SingleProduct = () => {
                             <div className='border-bottom py-3'>
                                 <p className='price'>$ {productState?.price}</p>
                                 <div className='d-flex align-items-center gap-10'>
-                                    <ReactStars
-                                        count={5}
-                                        value={Number(productState?.totalrating)}
-                                        size={24}
-                                        edit={false}
-                                        activeColor="#ffd700"
-                                    />
-                                    <p className='mb-0'>2 Reviews</p>
+                                    {
+                                        productState &&
+                                        <ReactStars
+                                            count={5}
+                                            value={Number(productState.totalrating) || 0}
+                                            size={24}
+                                            edit={false}
+                                            activeColor="#ffd700"
+                                        />
+                                    }
+                                    <p className='mb-0'>{productState?.ratings?.length} Reviews</p>
                                 </div>
                                 <a href='#review'>Write a review</a>
                             </div>
@@ -144,8 +148,8 @@ const SingleProduct = () => {
                                     }
                                     <div className='d-flex align-items-center gap-30 ms-4'>
                                         <button className='button border-0' type='button' onClick={() => {
-                                            alreadyAdded? navigate('/cart') : uploadCart()
-                                        }}>{alreadyAdded? "Go to Cart": "Add to Cart"}</button>
+                                            alreadyAdded ? navigate('/cart') : uploadCart()
+                                        }}>{alreadyAdded ? "Go to Cart" : "Add to Cart"}</button>
                                         <button className='button signup border-0 align-items-center'>Buy It Now</button>
                                     </div>
                                 </div>
@@ -195,14 +199,17 @@ const SingleProduct = () => {
                                 <div>
                                     <h4 className='mb-2'>Customer Reviews</h4>
                                     <div className='d-flex align-items-center gap-10'>
+                                    {
+                                        productState &&
                                         <ReactStars
                                             count={5}
-                                            value={Number(productState?.totalrating)}
+                                            value={Number(productState.totalrating) || 0}
                                             size={24}
                                             edit={false}
                                             activeColor="#ffd700"
                                         />
-                                        <p className='mb-0 t-review'>Based on 2 Reviews</p>
+                                    }
+                                        <p className='mb-0 t-review'>Based on {productState?.ratings?.length} Reviews</p>
                                     </div>
                                 </div>
                                 {orderedProduct || (
@@ -232,23 +239,23 @@ const SingleProduct = () => {
                                 </form>
                             </div>
                             <div className='reviews mt-4'>
-                                <div className='review'>
-                                    <div className='d-flex gap-10 align-items-center'>
-                                        <h6 className='mb-0'>Wyntia</h6>
-                                        <ReactStars
-                                            count={5}
-                                            value={
-                                                productState &&
-                                                    productState.ratings &&
-                                                    productState.ratings[0] &&
-                                                    !isNaN(productState.ratings[0].star) ?
-                                                    Number(productState.ratings[0].star) : 3
-                                            } size={24}
-                                            edit={false}
-                                            activeColor="#ffd700"
-                                        />
-                                    </div>
-                                    <p className='mt-3'>{productState && productState.ratings && productState.ratings[0] ? productState.ratings[0].comment : ''}</p>                                </div>
+                                <div className='reviews mt-4'>
+                                    {productState?.ratings?.map((rating, index) => (
+                                        <div className='review' key={index}>
+                                            <div className='d-flex gap-10 align-items-center'>
+                                                <h6 className='mb-0'>{rating?.postedBy?.firstname}</h6>
+                                                <ReactStars
+                                                    count={5}
+                                                    value={!isNaN(rating.star) ? Number(rating.star) : 0}
+                                                    size={24}
+                                                    edit={false}
+                                                    activeColor="#ffd700"
+                                                />
+                                            </div>
+                                            <p className='mt-3'>{rating.comment}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>
