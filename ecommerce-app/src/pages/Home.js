@@ -271,7 +271,7 @@ const Home = () => {
           </div>
           <div className="row">
             {
-              productState && productState.filter(item => item.tags.includes('special')).slice(0, 4).map((item, index) => {
+              productState && productState?.filter(item => item.tags.includes('special')).slice(0, 4).map((item, index) => {
                 return (
                   <SpecialProduct key={index} id={item?._id} brand={item?.brand} title={item?.title} stars={item?.totalrating}
                     price={item?.price} quantity={item?.quantity} image={item?.images[1].url} sold={item?.sold} />

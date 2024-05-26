@@ -382,6 +382,33 @@ const removeProductFromCart = asyncHandler(async (req, res) => {
     }
 });
 
+const updateProductQuantity = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { productId } = req.params; 
+    const { quantity } = req.body;
+    validateMongodbId(_id);
+  
+    try {
+        const user = await User.findById(_id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const item = user.cart.find(item => item.productId.toString() === productId);
+        if (!item) {
+            return res.status(404).json({ message: "Product not found in cart" });
+        }
+
+        item.quantity = quantity;
+
+        await user.save();
+
+        res.json(user.cart);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 const emptyCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     validateMongodbId(_id);
@@ -546,6 +573,7 @@ module.exports = {
     userCart,
     getUserCart,
     removeProductFromCart,
+    updateProductQuantity,
     emptyCart,
     applyCoupon,
     createOrder,

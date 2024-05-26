@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authService, addtoWishlist } from "./userService";
 import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
 
 export const registerUser = createAsyncThunk("auth/registerUser", async (userData, thunkApi) => {
     try {
@@ -59,6 +60,18 @@ export const removeProductFromCart = createAsyncThunk(
             return thunkApi.rejectWithValue(error);
         }
 });
+
+export const updateProductQuantityInCart = createAsyncThunk(
+    'user/cart/updateProductQuantityInCart',
+    async ({productId, quantity}, { rejectWithValue }) => {
+        try {
+            const response = await authService.updateProductQuantityInCart(productId, quantity);
+            return response;
+        } catch (err) {
+            return rejectWithValue(err.response.data);
+        }
+    }
+);
 
 const getCustomerfromLocalStorage = localStorage.getItem('customer')
     ? JSON.parse(localStorage.getItem('customer')) : null;
@@ -169,7 +182,22 @@ export const authSlice = createSlice({
                 state.isError = true;
                 state.isSuccess = false;
                 state.message = action.error;
-            })
+            }).addCase(updateProductQuantityInCart.pending, (state) => {
+                state.isLoading = true;
+            }).addCase(updateProductQuantityInCart.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isError = false;
+                state.isSuccess = true;
+                state.cartProducts = action.payload;
+                if(state.isSuccess === true){
+                    toast.success('Product quantity updated successfully');
+                }
+            }).addCase(updateProductQuantityInCart.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.message = action.error;
+            });
     }
 })
 

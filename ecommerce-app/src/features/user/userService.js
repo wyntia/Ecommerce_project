@@ -26,6 +26,7 @@ const getUserWishlist = async()=>{
 const addToCart = async(cartData) => {
     const { product, quantity, color, price } = cartData;
     const data = { productId: product, quantity, color, price };
+    console.log(data);
     const response = await axios.post(`${base_url}user/cart`, data, config());
     if(response.data){
         return response.data;
@@ -46,11 +47,20 @@ const removeProductFromCart = async(productId)=>{
     }
 }
 
+const updateProductQuantityInCart = async(productId, quantity)=>{
+    const data = { quantity };
+    const response = await axios.put(`${base_url}user/cart/${productId}`, data, config());
+    if(response.data){
+        return response.data;
+    }
+}
+
 export const authService = {
     register,
     login,
     getUserWishlist,
     addToCart,
     getCart,
-    removeProductFromCart
+    removeProductFromCart,
+    updateProductQuantityInCart
 };

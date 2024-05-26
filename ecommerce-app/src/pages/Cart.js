@@ -6,15 +6,19 @@ import { MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom'
 import Container from '../components/Container';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserCart } from '../features/user/userSlice';
+import { getUserCart, updateProductQuantityInCart } from '../features/user/userSlice';
 import Color from '../components/Color';
 import axios from 'axios';
 import { base_url, config } from '../utils/axiosConfig';
 
 const Cart = () => {
+
+    
     const dispatch = useDispatch();
     const userCartState = useSelector(state => state.auth.cartProducts)
+    const user = useSelector(state => state.auth.user);
     useEffect(() => {
+        
         dispatch(getUserCart());
     }, []);
 
@@ -27,6 +31,26 @@ const Cart = () => {
             console.error(error);
         }
     };
+
+    const handleQuantityChange = async (productId, event) => {
+        const newQuantity = event.target.value;
+        try {
+            await axios.put(`${base_url}user/cart/${productId}`, { quantity: newQuantity }, config());
+            // Po zaktualizowaniu ilości produktu, odśwież koszyk
+            await dispatch(getUserCart());
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const [totalAmount, setTotalAmount] = useState(null);
+    useEffect(() => {
+        let sum = 0;
+        for (let i = 0; i < userCartState?.length; i++) {
+            sum += userCartState[i].productId.price * userCartState[i].quantity;
+            setTotalAmount(sum);
+        }
+    }, [userCartState])
 
     return (
         <div>
@@ -53,7 +77,7 @@ const Cart = () => {
                                                 <p >{item?.productId?.title}</p>
                                                 <p className='d-flex gap-3 '>Color:
                                                     <ul className='colors ps-0'>
-                                                        <li style={{backgroundColor: item?.color?.title}}/>
+                                                        <li style={{ backgroundColor: item?.color?.title }} />
                                                     </ul>
                                                 </p>
                                                 <p >Size: M</p>
@@ -64,7 +88,16 @@ const Cart = () => {
                                         </div>
                                         <div className='cart-col-3 d-flex align-items-center gap-15'>
                                             <div className=''>
-                                                <input type='number' className='form-control' id='' name='' min={1} max={10} value={item?.quantity} />
+                                                <input
+                                                    type='number'
+                                                    className='form-control'
+                                                    id=''
+                                                    name=''
+                                                    min={1}
+                                                    max={10}
+                                                    value={item?.quantity}
+                                                    onChange={(event) => handleQuantityChange(item.productId._id, event)}
+                                                />
                                             </div>
                                             <div>
                                                 <MdDelete className='text-danger' onClick={() => handleDelete(item?.productId?._id)} />
@@ -80,11 +113,13 @@ const Cart = () => {
                         <div className='col-12 py-2 mt-4'>
                             <div className='d-flex justify-content-between align-items-baseline'>
                                 <Link to='/product' className='button'>Continue Shopping</Link>
-                                <div className='d-flex flex-column align-items-center'>
-                                    <h4>Subtotal: $ 400</h4>
-                                    <p>Taxes and shipping calculated at checkout</p>
-                                    <Link to='/checkout' className='button'>Checkout</Link>
-                                </div>
+                                {
+                                    (totalAmount !== null || totalAmount !== 0) && <div className='d-flex flex-column align-items-center'>
+                                        <h4>Subtotal: $ {totalAmount || 0}</h4>
+                                        <p>Taxes and shipping calculated at checkout</p>
+                                        <Link to='/checkout' className='button'>Checkout</Link>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
