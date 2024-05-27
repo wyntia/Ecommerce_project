@@ -113,7 +113,11 @@ export const productSlice = createSlice({
                 state.isLoading = false;
                 state.isError = true;
                 state.isSuccess = false;
-                state.message = action.error;});
+                state.message = action.error;
+                if(state.isError === true){
+                    toast.error('Please log in to rate this product');
+                }
+            });
 
     }
 })

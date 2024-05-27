@@ -106,7 +106,7 @@ export const authSlice = createSlice({
                 state.isSuccess = false;
                 state.message = action.error;
                 if (state.isError === true) {
-                    toast.success(action.error.message);
+                    toast.error("Email or Phone already in use");
                 }
             })
             .addCase(loginUser.pending, (state) => {
@@ -126,7 +126,7 @@ export const authSlice = createSlice({
                 state.isSuccess = false;
                 state.message = action.error;
                 if (state.isError === true) {
-                    toast.success(action.error.message);
+                    toast.error(action.error.message);
                 }
             }).addCase(getUserProductWishlist.pending, (state) => {
                 state.isLoading = true;
