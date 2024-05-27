@@ -70,12 +70,27 @@ const getallProducts = asyncHandler(async (req, res) => {
     try{
         //filtering
         const queryObj = {...req.query};
-        const excludeFields = ['page', 'sort', 'limit', 'fields'];
+        const excludeFields = ['page', 'sort', 'limit', 'fields', 'brand'];
         excludeFields.forEach(el => delete queryObj[el]);
         let queryStr = JSON.stringify(queryObj);
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
         
         let query = Product.find(JSON.parse(queryStr));
+
+        // If brand filter is present, add it to the query
+        if(req.query.brand){
+            query = query.find({ brand: req.query.brand });
+        }
+        
+         // If category filter is present, add it to the query
+         if(req.query.category){
+            query = query.find({ category: req.query.category });
+        }
+
+        // If tags filter is present, add it to the query
+        if(req.query.tags){
+            query = query.find({ tags: { $in: req.query.tags } });
+        }
 
         //sorting
         if(req.query.sort){
