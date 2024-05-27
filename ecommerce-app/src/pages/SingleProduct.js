@@ -9,7 +9,7 @@ import { IoGitCompare } from "react-icons/io5";
 import Container from '../components/Container';
 import wish from '../images/wish.svg'
 import { useDispatch, useSelector } from 'react-redux';
-import { getAProduct, addToWishlist } from '../features/products/productSlice';
+import { getAProduct, addToWishlist, addRating } from '../features/products/productSlice';
 import { addProdToCart, getUserCart } from '../features/user/userSlice';
 import { toast } from "react-toastify";
 
@@ -17,9 +17,9 @@ const SingleProduct = () => {
     const location = useLocation();
     const getProductId = location.pathname.split('/')[2];
     const dispatch = useDispatch();
-    const cartState = useSelector(state => state.auth.cartProducts);
+    const cartState = useSelector(state => state?.auth?.cartProducts);
     const [alreadyAdded, setAlreadyAdded] = useState(false);
-    const productState = useSelector(state => state.product.product);
+    const productState = useSelector(state => state?.product?.product);
 
     const navigate = useNavigate();
 
@@ -27,7 +27,7 @@ const SingleProduct = () => {
         dispatch(getAProduct(getProductId));
         dispatch(getUserCart());
     }, [dispatch, getProductId]);
-    
+
     const addToWish = (id) => {
         dispatch(addToWishlist(id));
     }
@@ -66,10 +66,28 @@ const SingleProduct = () => {
         }
     }
 
+    const [star, setStar] = useState(null);
+    const [comment, setComment] = useState(null);
+
+    const addRatingToProduct = () => {
+        if (star === null) {
+            toast.error('Please select a star rating');
+            return false
+        }
+        else if (comment === null) {
+            toast.error('Please write a comment');
+            return false
+        }
+        else {
+            dispatch(addRating({ star: star, comment: comment, prodId: getProductId }))
+        }
+        return false
+    }
+
     return (
         <div>
-            <Meta title={'Product Name'} />
-            <BreadCrumb title='Product Name' />
+            <Meta title={productState?.title} />
+            <BreadCrumb title={productState?.title} />
             <Container class1='main-product-wrapper py-5 home-wrapper-2'>
                 <div className='row'>
                     <div className='col-6 '>
@@ -198,16 +216,16 @@ const SingleProduct = () => {
                                 <div>
                                     <h4 className='mb-2'>Customer Reviews</h4>
                                     <div className='d-flex align-items-center gap-10'>
-                                    {
-                                        productState &&
-                                        <ReactStars
-                                            count={5}
-                                            value={Number(productState.totalrating) || 0}
-                                            size={24}
-                                            edit={false}
-                                            activeColor="#ffd700"
-                                        />
-                                    }
+                                        {
+                                            productState &&
+                                            <ReactStars
+                                                count={5}
+                                                value={Number(productState.totalrating) || 0}
+                                                size={24}
+                                                edit={false}
+                                                activeColor="#ffd700"
+                                            />
+                                        }
                                         <p className='mb-0 t-review'>Based on {productState?.ratings?.length} Reviews</p>
                                     </div>
                                 </div>
@@ -219,23 +237,24 @@ const SingleProduct = () => {
                             </div>
                             <div className='review-form py-4'>
                                 <h4>Write a Review</h4>
-                                <form action='' className='d-flex flex-column gap-15'>
-                                    <div>
-                                        <ReactStars
-                                            count={5}
-                                            value={4}
-                                            size={24}
-                                            edit={true}
-                                            activeColor="#ffd700"
-                                        />
-                                    </div>
-                                    <div>
-                                        <textarea name='' id='' cols='30' className='w-100 form-control' rows='4' placeholder='Comments' />
-                                    </div>
-                                    <div className='d-flex justify-content-end'>
-                                        <button className='button border-0'>Submit Review</button>
-                                    </div>
-                                </form>
+                                <div>
+                                    <ReactStars
+                                        count={5}
+                                        value={0}
+                                        size={24}
+                                        edit={true}
+                                        activeColor="#ffd700"
+                                        onChange= {(e) => {
+                                            setStar(e)
+                                        } }
+                                    />
+                                </div>
+                                <div>
+                                    <textarea name='' id='' cols='30' className='w-100 form-control' rows='4' placeholder='Comments' onChange={(e) =>{ setComment(e.target.value)}} />
+                                </div>
+                                <div className='d-flex justify-content-end mt-3'>
+                                    <button  onClick={addRatingToProduct} className='button border-0' type='button'>Submit Review</button>
+                                </div>
                             </div>
                             <div className='reviews mt-4'>
                                 <div className='reviews mt-4'>
@@ -245,13 +264,13 @@ const SingleProduct = () => {
                                                 <h6 className='mb-0'>{rating?.postedBy?.firstname}</h6>
                                                 <ReactStars
                                                     count={5}
-                                                    value={!isNaN(rating.star) ? Number(rating.star) : 0}
+                                                    value={!isNaN(rating?.star) ? Number(rating?.star) : 0}
                                                     size={24}
                                                     edit={false}
                                                     activeColor="#ffd700"
                                                 />
                                             </div>
-                                            <p className='mt-3'>{rating.comment}</p>
+                                            <p className='mt-3'>{rating?.comment}</p>
                                         </div>
                                     ))}
                                 </div>

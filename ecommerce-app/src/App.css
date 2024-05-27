@@ -518,8 +518,17 @@ footer .input-group .form-control {
   white-space: nowrap;
 }
 
-.badge {
+.badge{
   background-color: var(--color-e0393ed5);
+
+}
+.badge1 {
+  background-color: var(--color-e0393ed5);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /*Special Product Page Ends Here */
