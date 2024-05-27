@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import BreadCrumb from '../components/BreadCrumb'
 import Meta from '../components/Meta'
-import watch from '../images/watch.jpg'
 import { MdDelete } from "react-icons/md";
 import { Link } from 'react-router-dom'
 import Container from '../components/Container';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserCart, updateProductQuantityInCart } from '../features/user/userSlice';
-import Color from '../components/Color';
+import { getUserCart} from '../features/user/userSlice';
 import axios from 'axios';
 import { base_url, config } from '../utils/axiosConfig';
 
@@ -16,7 +14,6 @@ const Cart = () => {
     
     const dispatch = useDispatch();
     const userCartState = useSelector(state => state.auth.cartProducts)
-    const user = useSelector(state => state.auth.user);
     useEffect(() => {
         
         dispatch(getUserCart());

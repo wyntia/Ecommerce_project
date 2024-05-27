@@ -3,7 +3,6 @@ import BreadCrumb from '../components/BreadCrumb'
 import Meta from '../components/Meta'
 import { Link, useLocation } from 'react-router-dom'
 import { FaArrowLeftLong } from "react-icons/fa6";
-import blog from '../images/blog-1.jpg'
 import Container from '../components/Container';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBlog } from '../features/blogs/blogSlice';
@@ -14,9 +13,11 @@ const SingleBlog = () => {
     const location = useLocation();
     const getBlogId = location.pathname.split('/')[2];
     const dispatch = useDispatch();
+    
     useEffect(() => {
         getaBlog();
     }, []);
+
     const getaBlog = () => {
         dispatch(getBlog(getBlogId));
     };

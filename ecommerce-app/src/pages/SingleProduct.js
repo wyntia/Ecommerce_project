@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import BreadCrumb from '../components/BreadCrumb'
 import Meta from '../components/Meta'
-import ProductCard from '../components/ProductCard'
 import ReactStars from "react-rating-stars-component";
 import ReactImageZoom from 'react-image-zoom';
 import Color from '../components/Color';
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { IoGitCompare } from "react-icons/io5";
-import { IoMdHeartEmpty } from "react-icons/io";
-import watch from '../images/watch.jpg'
 import Container from '../components/Container';
 import wish from '../images/wish.svg'
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,10 +22,12 @@ const SingleProduct = () => {
     const productState = useSelector(state => state.product.product);
 
     const navigate = useNavigate();
+
     useEffect(() => {
         dispatch(getAProduct(getProductId));
         dispatch(getUserCart());
-    }, []);
+    }, [dispatch, getProductId]);
+    
     const addToWish = (id) => {
         dispatch(addToWishlist(id));
     }

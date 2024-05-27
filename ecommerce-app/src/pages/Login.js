@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import BreadCrumb from '../components/BreadCrumb'
 import Meta from '../components/Meta'
 import { Link } from 'react-router-dom'
@@ -6,7 +6,7 @@ import Container from '../components/Container'
 import CustomInput from '../components/CustomInput'
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { loginUser, getUserCart } from '../features/user/userSlice';
 
 const loginSchema = yup.object({
@@ -16,9 +16,7 @@ const loginSchema = yup.object({
 
 const Login = () => {
 
-
     const dispatch = useDispatch();
-    const user = useSelector(state => state?.auth?.user); // pobierz stan logowania użytkownika
 
     const formik = useFormik({
         initialValues: {

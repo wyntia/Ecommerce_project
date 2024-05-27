@@ -17,7 +17,7 @@ const OurStore = () => {
   const [minPrice, setMinPrice] = useState(null);
   const [maxPrice, setMaxPrice] = useState(null);
   const [sort, setSort] = useState('manual'); // Dodajemy stan dla sortowania
-  
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const OurStore = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (productState) {
+    if (Array.isArray(productState)) {
       let newCategories = [];
       let newTags = [];
       for (let element of productState) {
@@ -54,21 +54,21 @@ const OurStore = () => {
     return brandMatch && categoryMatch && tagMatch && priceMatch;
   }) : [];
 
-   // Sortowanie produktów
-   const sortedProducts = [...filteredProducts];
-   if (sort === 'title') {
-     sortedProducts.sort((a, b) => a.title.localeCompare(b.title));
-   } else if (sort === '-title') {
-     sortedProducts.sort((a, b) => b.title.localeCompare(a.title));
-   } else if (sort === 'price') {
-     sortedProducts.sort((a, b) => a.price - b.price);
-   } else if (sort === '-price') {
-     sortedProducts.sort((a, b) => b.price - a.price);
-   } else if (sort === 'createdAt') {
-     sortedProducts.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-   } else if (sort === '-createdAt') {
-     sortedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-   }
+  // Sortowanie produktów
+  const sortedProducts = [...filteredProducts];
+  if (sort === 'title') {
+    sortedProducts.sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sort === '-title') {
+    sortedProducts.sort((a, b) => b.title.localeCompare(a.title));
+  } else if (sort === 'price') {
+    sortedProducts.sort((a, b) => a.price - b.price);
+  } else if (sort === '-price') {
+    sortedProducts.sort((a, b) => b.price - a.price);
+  } else if (sort === 'createdAt') {
+    sortedProducts.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  } else if (sort === '-createdAt') {
+    sortedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
 
   return (
     <>
@@ -149,15 +149,15 @@ const OurStore = () => {
                 <div className='d-flex align-items-center gap-10'>
                   <p className='mb-0 d-block' style={{ width: "100px" }}>Sort By:</p>
                   <select
-    name=''
-    value={sort} // Zmiana defaultValue na value
-    className='form-control form-select'
-    id=''
-    onChange={(e) => {
-      console.log(e.target.value); // Dodajemy console.log
-      setSort(e.target.value);
-    }}
-  >                    <option value='manual'>Featured</option>
+                    name=''
+                    value={sort} // Zmiana defaultValue na value
+                    className='form-control form-select'
+                    id=''
+                    onChange={(e) => {
+                      console.log(e.target.value); // Dodajemy console.log
+                      setSort(e.target.value);
+                    }}
+                  >                    <option value='manual'>Featured</option>
                     <option value='title'>Alphabetically, A-Z</option>
                     <option value='-title'>Alphabetically, Z-A</option>
                     <option value='price'>Price, low to high</option>

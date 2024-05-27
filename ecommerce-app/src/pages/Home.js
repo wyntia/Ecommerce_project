@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import BlogCard from "../components/BlogCard";
 import ProductCard from "../components/ProductCard";
 import SpecialProduct from "../components/SpecialProduct";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import Container from "../components/Container";
 import { services } from "../utils/Data";
@@ -20,6 +20,7 @@ const Home = () => {
     getblogs();
     getProducts();
   }, []);
+
   const getblogs = () => {
     dispatch(getAllBlogs());
   };
@@ -271,10 +272,10 @@ const Home = () => {
           </div>
           <div className="row">
             {
-              productState && productState?.filter(item => item.tags.includes('special')).slice(0, 4).map((item, index) => {
+              Array.isArray(productState) && productState.filter(item => item.tags.includes('special')).slice(0, 4).map((item, index) => {
                 return (
-                  <SpecialProduct key={index} id={item?._id} brand={item?.brand} title={item?.title} stars={item?.totalrating}
-                    price={item?.price} quantity={item?.quantity} image={item?.images[1].url} sold={item?.sold} />
+                  <SpecialProduct key={index} id={item._id} brand={item.brand} title={item.title} stars={item.totalrating}
+                    price={item.price} quantity={item.quantity} image={item.images[1].url} sold={item.sold} />
                 )
               })
             }
@@ -289,12 +290,14 @@ const Home = () => {
         </div>
         <div className="row">
           {
-            productState && productState.filter(item => item.tags.includes('popular')).slice(0, 4).map((item, index) => {
-              return (
-                <SpecialProduct key={index} brand={item?.brand} title={item?.title} stars={item?.totalrating}
-                  price={item?.price} quantity={item?.quantity} image={item?.images[1].url} sold={item?.sold} />
-              )
-            })
+            Array.isArray(productState) ?
+              productState.filter(item => item.tags.includes('popular')).slice(0, 4).map((item, index) => {
+                return (
+                  <SpecialProduct key={index} id={item._id} brand={item.brand} title={item.title} stars={item.totalrating}
+                    price={item.price} quantity={item.quantity} image={item.images[1].url} sold={item.sold} />
+                )
+              })
+              : <p>Loading...</p>
           }
         </div>
       </Container>

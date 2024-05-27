@@ -1,26 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import { NavLink, Link } from 'react-router-dom'
-import { BsSearch } from 'react-icons/bs'
-import compare from '../images/compare.svg'
-import wishlist from '../images/wishlist.svg'
-import user from '../images/user.svg'
-import cart from '../images/cart.svg'
-import menu from '../images/menu.svg'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react';
+import { NavLink, Link } from 'react-router-dom';
+import { BsSearch } from 'react-icons/bs';
+import compare from '../images/compare.svg';
+import wishlist from '../images/wishlist.svg';
+import user from '../images/user.svg';
+import cart from '../images/cart.svg';
+import menu from '../images/menu.svg';
+import {useSelector } from 'react-redux';
 
 const Header = () => {
-
-  const dispatch = useDispatch();
   const cartState = useSelector(state => state?.auth?.cartProducts);
   const auth = useSelector(state => state.auth);
   const [total, setTotal] = useState(null);
   const [firstname, setFirstname] = useState('');
 
   useEffect(() => {
-
-    if (auth?.user?.firstname) {
-      setFirstname(auth.user.firstname);
-  }
+    const storedFirstname = localStorage.getItem('firstname');
+    if (auth?.user?.firstname !== storedFirstname) {
+      setFirstname(auth?.user?.firstname);
+      localStorage.setItem('firstname', auth?.user?.firstname);
+    }
 
     let sum = 0;
     for (let i = 0; i < cartState?.length; i++) {
@@ -28,6 +27,13 @@ const Header = () => {
       setTotal(sum);
     }
   }, [cartState, auth]);
+
+  // const handleLogout = () => {
+  //   localStorage.removeItem('token');
+  //   localStorage.removeItem('firstname');
+  //   window.location.reload();
+  // };
+
   return (
     <>
       <header className='header-top-strip py-3'>
@@ -142,7 +148,8 @@ const Header = () => {
         </div>
       </header>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
+
