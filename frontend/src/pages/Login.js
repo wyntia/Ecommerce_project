@@ -1,3 +1,5 @@
+// Login.js
+
 import React from 'react'
 import BreadCrumb from '../components/BreadCrumb'
 import Meta from '../components/Meta'
@@ -7,7 +9,7 @@ import CustomInput from '../components/CustomInput'
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
-import { loginUser, getUserCart } from '../features/user/userSlice';
+import { loginUser, getUserCart, logoutUser } from '../features/user/userSlice'; // Zaktualizowany import
 
 const loginSchema = yup.object({
     email: yup.string().email("Please enter a valid email address").required("Email is required"),
@@ -33,8 +35,10 @@ const Login = () => {
     });
 
     const handleLogout = () => {
-        localStorage.removeItem('token'); // usuń dane użytkownika z localStorage
-        window.location.reload(); // odśwież stronę, aby zresetować stan Redux
+        dispatch(logoutUser()) // Wyloguj użytkownika po kliknięciu przycisku wylogowania
+            .then(() => {
+                window.location.reload(); // Odśwież stronę, aby zresetować stan Redux
+            });
     };
 
     return (

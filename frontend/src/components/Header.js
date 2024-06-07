@@ -14,11 +14,12 @@ const Header = () => {
   const [total, setTotal] = useState(null);
   const [firstname, setFirstname] = useState('');
 
+
   useEffect(() => {
     const storedFirstname = localStorage.getItem('firstname');
+    setFirstname(auth?.user?.firstname || ''); // Zmiana: ustaw wartość firstname na pustą string, jeśli jest undefined
     if (auth?.user?.firstname !== storedFirstname) {
-      setFirstname(auth?.user?.firstname);
-      localStorage.setItem('firstname', auth?.user?.firstname);
+        localStorage.setItem('firstname', auth?.user?.firstname || ''); // Zmiana: ustaw pustą wartość firstname w localStorage, jeśli jest undefined
     }
 
     let sum = 0;
@@ -26,14 +27,18 @@ const Header = () => {
       sum += cartState[i]?.productId?.price * cartState[i]?.quantity;
       setTotal(sum);
     }
+
+    // Zapisz dane koszyka w localStorage
+    localStorage.setItem('cartState', JSON.stringify(cartState));
+    // Zapisz sumę koszyka w localStorage
+    localStorage.setItem('cartTotal', sum);
+    
   }, [cartState, auth]);
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem('token');
-  //   localStorage.removeItem('firstname');
-  //   window.location.reload();
-  // };
 
+  const isLoggedIn = !!localStorage.getItem('token');
+
+  
   return (
     <>
       <header className='header-top-strip py-3'>
@@ -93,7 +98,7 @@ const Header = () => {
                 <Link to='/login' className='d-flex align-items-center gap-10 text-white'>
                   <img className='header-img' src={user} alt="user" />
                   <p className='mb-0'>
-                    {auth?.isSuccess ? firstname : "Login"} <br /> My Account
+                    {isLoggedIn ? firstname : 'Login'} <br /> My Account
                   </p>
                 </Link>
               </div>

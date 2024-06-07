@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authService, addtoWishlist } from "./userService";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
 
 export const registerUser = createAsyncThunk("auth/registerUser", async (userData, thunkApi) => {
     try {
@@ -69,6 +68,18 @@ export const updateProductQuantityInCart = createAsyncThunk(
             return response;
         } catch (err) {
             return rejectWithValue(err.response.data);
+        }
+    }
+);
+
+export const logoutUser = createAsyncThunk (
+    'user/logout',
+    async ( thunkApi) => {
+        try{
+            localStorage.removeItem('token');
+            return await authService.logout();
+        }catch(error){
+            return thunkApi.rejectWithValue(error);
         }
     }
 );
@@ -197,7 +208,23 @@ export const authSlice = createSlice({
                 state.isError = true;
                 state.isSuccess = false;
                 state.message = action.error;
-            });
+            }).addCase(logoutUser.pending, (state) => {
+                state.isLoading = true;
+            }).addCase(logoutUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isError = false;
+                state.isSuccess = true;
+                state.user = null;
+                if(state.isSuccess === true){
+                    localStorage.removeItem('token');
+                    toast.success('User logged out successfully');
+                }
+            }).addCase(logoutUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.message = action.error;
+            })
     }
 })
 
