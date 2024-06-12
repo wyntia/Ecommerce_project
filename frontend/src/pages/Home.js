@@ -7,12 +7,11 @@ import Marquee from "react-fast-marquee";
 import Container from "../components/Container";
 import { services } from "../utils/Data";
 import { getAllBlogs } from "../features/blogs/blogSlice";
-import { useDispatch, useSelector } from 'react-redux';
-import moment from 'moment';
+import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
 import { getAllProducts } from "../features/products/productSlice";
 
 const Home = () => {
-
   const blogState = useSelector((state) => state?.blog?.blog);
   const productState = useSelector((state) => state?.product?.product);
   const dispatch = useDispatch();
@@ -27,7 +26,7 @@ const Home = () => {
 
   const getProducts = () => {
     dispatch(getAllProducts());
-  }
+  };
   return (
     <>
       <Container class1="home-wrapper-1 py-5">
@@ -113,89 +112,67 @@ const Home = () => {
             <div className="row">
               <div className="col-12">
                 <div className="services d-flex align-items-center justify-content-between">
-                  {
-                    services?.map((i, j) => {
-                      return (
-                        <div className="d-flex align-items-center gap-15" key={j}>
-                          <img src={i.image} alt="service" />
-                          <div>
-                            <h6>{i.title}</h6>
-                            <p className="mb-0">{i.tagline}</p>
-                          </div>
+                  {services?.map((i, j) => {
+                    return (
+                      <div className="d-flex align-items-center gap-15" key={j}>
+                        <img src={i.image} alt="service" />
+                        <div>
+                          <h6>{i.title}</h6>
+                          <p className="mb-0">{i.tagline}</p>
                         </div>
-                      )
-                    })}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
           </div>
         </section>
       </Container>
-      <Container class1='home-wrapper-2 py-5'>
+      <Container class1="home-wrapper-2 py-5">
         <div className="row">
           <div className="col-12">
             <div className="categories d-flex flex-wrap justify-content-between align-items-center">
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Music & Gaming</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/camera.jpg" alt="camera" />
-              </div>
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Cameras</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/camera.jpg" alt="camera" />
-              </div>
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Smart TV</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/tv.jpg" alt="camera" />
-              </div>
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Smart Watches</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/headphone.jpg" alt="camera" />
-              </div>
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Music & Gaming</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/camera.jpg" alt="camera" />
-              </div>
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Cameras</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/camera.jpg" alt="camera" />
-              </div>
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Smart TV</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/tv.jpg" alt="camera" />
-              </div>
-              <div className="d-flex gap align-items-center">
-                <div>
-                  <h6>Smart Watches</h6>
-                  <p>10 Items</p>
-                </div>
-                <img src="images/headphone.jpg" alt="camera" />
-              </div>
+              {[
+                ...new Set(
+                  (Array.isArray(productState) ? productState : []).map(
+                    (item) => item?.brand
+                  )
+                ),
+              ]
+                .slice(0, 8)
+                .map((brand, index) => {
+                  const itemCount = (
+                    Array.isArray(productState) ? productState : []
+                  ).filter((item) => item?.brand === brand).length;
+                  const images = [
+                    "images/laptop.jpg", // Adjust paths as necessary
+                    "images/headphone.jpg",
+                    "images/speaker.jpg",
+                    "images/tv.jpg",
+                    "images/camera.jpg",
+                  ];
+                  const imageIndex = index % images.length;
+
+                  const imageUrl = images[imageIndex];
+                  return (
+                    <div
+                      className="d-flex justify-content-between align-items-center"
+                      key={index}
+                    >
+                      <div>
+                        <h6>{brand}</h6>
+                        <p>{itemCount} Items</p>
+                      </div>
+                      <img className="img-fluid" src={imageUrl} alt={brand} />
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
       </Container>
-      <Container class1='featured-wrapper py-5 home-wrapper-2'>
+      <Container class1="featured-wrapper py-5 home-wrapper-2">
         <div className="row">
           <div className="col-3"></div>
           <h3 className="section-heading">Featured Collection</h3>
@@ -205,7 +182,7 @@ const Home = () => {
           <ProductCard />
         </div>
       </Container>
-      <Container class1='famous-wrapper py-5 home-wrapper-2'>
+      <Container class1="famous-wrapper py-5 home-wrapper-2">
         <div className="row">
           <div className="col-3">
             <div className="famous-card position-relative">
@@ -265,20 +242,31 @@ const Home = () => {
           </div>
         </div>
       </Container>
-      <Container class1='special-wrapper py-5 home-wrapper-2'>
+      <Container class1="special-wrapper py-5 home-wrapper-2">
         <div className="row">
           <div className="col-12">
             <h3 className="section-heading">Special Products</h3>
           </div>
           <div className="row">
-            {
-              Array.isArray(productState) && productState.filter(item => item.tags.includes('special')).slice(0, 4).map((item, index) => {
-                return (
-                  <SpecialProduct key={index} id={item._id} brand={item.brand} title={item.title} stars={item.totalrating}
-                    price={item.price} quantity={item.quantity} image={item.images[1].url} sold={item.sold} />
-                )
-              })
-            }
+            {Array.isArray(productState) &&
+              productState
+                .filter((item) => item.tags.includes("special"))
+                .slice(0, 4)
+                .map((item, index) => {
+                  return (
+                    <SpecialProduct
+                      key={index}
+                      id={item._id}
+                      brand={item.brand}
+                      title={item.title}
+                      stars={item.totalrating}
+                      price={item.price}
+                      quantity={item.quantity}
+                      image={item.images[1].url}
+                      sold={item.sold}
+                    />
+                  );
+                })}
           </div>
         </div>
       </Container>
@@ -289,16 +277,28 @@ const Home = () => {
           </div>
         </div>
         <div className="row">
-          {
-            Array.isArray(productState) ?
-              productState.filter(item => item.tags.includes('popular')).slice(0, 4).map((item, index) => {
+          {Array.isArray(productState) ? (
+            productState
+              .filter((item) => item.tags.includes("popular"))
+              .slice(0, 4)
+              .map((item, index) => {
                 return (
-                  <SpecialProduct key={index} id={item._id} brand={item.brand} title={item.title} stars={item.totalrating}
-                    price={item.price} quantity={item.quantity} image={item.images[1].url} sold={item.sold} />
-                )
+                  <SpecialProduct
+                    key={index}
+                    id={item._id}
+                    brand={item.brand}
+                    title={item.title}
+                    stars={item.totalrating}
+                    price={item.price}
+                    quantity={item.quantity}
+                    image={item.images[1].url}
+                    sold={item.sold}
+                  />
+                );
               })
-              : <p>Loading...</p>
-          }
+          ) : (
+            <p>Loading...</p>
+          )}
         </div>
       </Container>
       <Container class1="marquee-wrapper py-5">
@@ -341,15 +341,22 @@ const Home = () => {
           <h3 className="section-heading">Latest News</h3>
         </div>
         <div className="row">
-          {
-            Array.isArray(blogState) && blogState.slice(0, 4).map((item, index) => {
+          {Array.isArray(blogState) &&
+            blogState.slice(0, 4).map((item, index) => {
               return (
-                <div className='col-3 mb-3' key={index}>
-                  <BlogCard id={item?._id} title={item?.title} description={item?.description} date={moment(item?.created_at).format('MMMM Do YYYY, h:mm:ss a')} image={item?.image} />
+                <div className="col-3 mb-3" key={index}>
+                  <BlogCard
+                    id={item?._id}
+                    title={item?.title}
+                    description={item?.description}
+                    date={moment(item?.created_at).format(
+                      "MMMM Do YYYY, h:mm:ss a"
+                    )}
+                    image={item?.image}
+                  />
                 </div>
-              )
-            })
-          }
+              );
+            })}
         </div>
       </Container>
     </>

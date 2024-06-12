@@ -69,7 +69,8 @@ const Cart = () => {
                                     <div className='cart-data py-3 mb-2 d-flex justify-content-between align-items-center' key={index}>
                                         <div className='cart-col-1 d-flex align-items-center gap-15'>
                                             <div className='w-75'>
-                                                <img src={item?.productId?.images[0]?.url} className='img-fluid' alt='product' /></div>
+                                                <img src={item?.productId?.images[0]?.url} className='img-fluid' alt='product' />
+                                            </div>
                                             <div className='w-25'>
                                                 <p >{item?.productId?.title}</p>
                                                 <p className='d-flex gap-3 '>Color:

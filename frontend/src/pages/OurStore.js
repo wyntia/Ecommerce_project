@@ -154,7 +154,6 @@ const OurStore = () => {
                     className='form-control form-select'
                     id=''
                     onChange={(e) => {
-                      console.log(e.target.value); // Dodajemy console.log
                       setSort(e.target.value);
                     }}
                   >                    <option value='manual'>Featured</option>
