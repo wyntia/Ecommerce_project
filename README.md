@@ -15,7 +15,7 @@
 3. Paste this into .env file
 ```
 PORT=5000
-MONGODB_URL=mongodb+srv://bazy:bazy@cluster0.kphigj2.mongodb.net/sklep
+MONGODB_URL= example.url
 JWT_SECRET=mysecret
 ```
 
